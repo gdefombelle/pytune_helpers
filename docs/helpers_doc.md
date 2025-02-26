@@ -1,49 +1,90 @@
-# PyTune Helpers - Documentation et README
+# 📌 PyTune Helpers
 
-## 📌 Introduction
-**PyTune Helpers** est un package utilitaire conçu pour centraliser et simplifier l'envoi d'e-mails avec support de Celery pour l'envoi différé.
+## 📝 Introduction
+`pytune_helpers` est un module utilitaire conçu pour centraliser et faciliter l'envoi des emails dans PyTune. Il permet d'envoyer des emails immédiatement ou en tâche de fond via Celery, RabbitMQ et Redis.
 
-📌 **Fonctionnalités principales**
-- Envoi immédiat d'e-mails via SMTP
-- Support de l'envoi différé avec **Celery + RabbitMQ + Redis**
-- Centralisation des logs avec **pytune_logger**
-- Configuration dynamique via **pytune_configuration**
+Ce module est **dépendant de `pytune_configuration`** pour récupérer les paramètres SMTP et de `pytune_logger` pour la journalisation.
 
-## 📂 Organisation du projet
+---
 
-```bash
-pytune_helpers/
-│── pytune_helpers/
-│   ├── __init__.py   # Expose EmailService et CeleryClient
-│   ├── email_helper.py  # Service pour gérer l'envoi d'e-mails
-│   ├── celery_client.py # Client Celery pour l'envoi d'e-mails en arrière-plan
-│── tests/  # Tests unitaires
-│── README.md  # Documentation du projet
-│── pyproject.toml  # Configuration du package avec Poetry
-│── .env.example  # Exemple des variables d'environnement
+## ⚙️ Installation
+
+### 1️⃣ Prérequis
+Assurez-vous que vous avez installé `pytune_helpers` avec ses dépendances.
+
+```sh
+pip install pytune_helpers
 ```
 
-## 🚀 Installation
+Ou si vous utilisez Poetry :
 
-PyTune Helpers est conçu pour fonctionner avec **Poetry**.
-
-```bash
+```sh
 poetry add pytune_helpers
 ```
 
-### 📦 Dépendances
+### 2️⃣ Dépendances
+`pytune_helpers` dépend de **deux autres packages PyTune** :
+- [`pytune_configuration`](https://github.com/gdefombelle/pytune_configuration) (récupération des paramètres SMTP, RabbitMQ, Redis)
+- [`pytune_logger`](https://github.com/gdefombelle/pytune_logger) (journalisation des événements)
 
-- **pytune_configuration** : Gestion des paramètres de configuration
-- **pytune_logger** : Gestion des logs
-- **Celery** : Système de tâches en arrière-plan
-- **aiosmtplib** : Envoi d'e-mails asynchrone
+Assurez-vous qu'ils sont bien installés.
+
+---
+
+## 🛠️ Fonctionnalités principales
+
+### ✉️ Envoi d'email immédiat
+
+```python
+from pytune_helpers import EmailService
+
+email_service = EmailService()
+await email_service.send_email(
+    to_email="user@example.com",
+    subject="Bienvenue sur PyTune",
+    body="Merci de vous être inscrit !",
+    is_html=True
+)
+```
+
+### ⏳ Envoi d'email en arrière-plan (via Celery)
+
+```python
+await email_service.send_email(
+    to_email="user@example.com",
+    subject="Confirmation",
+    body="Votre demande a été reçue !",
+    is_html=True,
+    send_background=True
+)
+```
+
+---
+
+## 📦 Structure du module
+
+```
+pytune_helpers/
+│── __init__.py   # Importe EmailService et CeleryClient
+│── email_helper.py   # Service principal pour l'envoi d'emails
+│── celery_client.py   # Gestionnaire Celery pour les tâches en arrière-plan
+```
+
+- `email_helper.py` : Gère la construction et l'envoi des emails.
+- `celery_client.py` : Initialise Celery pour permettre l'envoi différé d'emails.
+
+---
 
 ## ⚙️ Configuration
 
-### 1️⃣ Variables d'environnement
-Créer un fichier `.env` dans le projet avec les informations suivantes :
+### 📜 Gestion des paramètres (via `pytune_configuration`)
 
-```
+Ce module ne contient **aucune configuration locale**. Tous les paramètres (SMTP, RabbitMQ, Redis) sont **stockés en base de données** et lus via `pytune_configuration`.
+
+Si vous utilisez une configuration locale sans base de données, ajoutez ces valeurs dans le `.env` de `pytune_configuration` :
+
+```ini
+# Exemple de configuration pour pytune_configuration
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
@@ -54,89 +95,52 @@ RABBIT_BROKER_URL=pyamqp://admin:MyStr0ngP@ss2024!@localhost//
 RABBIT_BACKEND=redis://127.0.0.1:6379/0
 ```
 
-📌 **Remarque :** Ces valeurs doivent être définies aussi dans `docker-compose.yml` en production.
+📌 **En production, ces valeurs doivent être stockées en base et non dans un fichier `.env` !**
 
-## 📧 Utilisation
+---
 
-### 1️⃣ Envoi immédiat d'un e-mail
-```python
-from pytune_helpers import EmailService
+## 🚀 Déploiement
 
-email_service = EmailService()
-email_service.send_email(
-    to_email="user@example.com",
-    subject="Bienvenue sur PyTune!",
-    body="<h1>Bienvenue!</h1><p>Merci de nous rejoindre.</p>",
-    is_html=True,
-    send_background=False  # Envoi immédiat
-)
-```
+Pour utiliser `pytune_helpers` dans un environnement Docker, assurez-vous que :
+- `pytune_configuration` est bien déployé avec accès à la base de données
+- Un service **RabbitMQ** et **Redis** sont en place pour Celery
 
-### 2️⃣ Envoi différé avec Celery
-```python
-email_service.send_email(
-    to_email="user@example.com",
-    subject="Email en arrière-plan",
-    body="Cet email est envoyé via Celery",
-    is_html=True,
-    send_background=True  # Envoi en différé avec Celery
-)
-```
+Exemple d'utilisation dans un `docker-compose.yml` :
 
-## 🛠️ Structure des classes
-
-### **1️⃣ CeleryClient** - Gestion des tâches Celery
-```python
-class CeleryClient:
-    def __init__(self):
-        self.celery_client = Celery(
-            "pytune",
-            broker=config.RABBIT_BROKER_URL,
-            backend=config.RABBIT_BACKEND,
-        )
-```
-📌 **Utilisation:**
-```python
-celery_client = CeleryClient()
-celery_client.send_mail.delay("user@example.com", "Sujet", "Contenu HTML", True)
-```
-
-### **2️⃣ EmailService** - Gestion de l'envoi d'e-mails
-```python
-class EmailService:
-    async def send_email(self, to_email, subject, body, is_html=False, send_background=False):
-        if send_background:
-            self.celery_client.send_mail.delay(to_email, subject, body, is_html)
-        else:
-            await self._send_email_task(to_email, subject, body, is_html)
-```
-
-## 🐳 Dockerisation
-
-En production, ce module est utilisé dans un **worker Celery** tournant dans Docker.
-
-📌 **Exemple docker-compose.yml** pour déployer un worker Celery qui envoie des e-mails :
 ```yaml
 services:
   email_worker:
-    image: pytune_email_worker:latest
-    restart: always
-    environment:
-      - RABBIT_BROKER_URL=${RABBIT_BROKER_URL}
-      - REDIS_BACKEND=${REDIS_BACKEND}
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - FROM_EMAIL=${FROM_EMAIL}
+    image: pytune-email-worker:latest
     depends_on:
       - rabbitmq
       - redis
+    environment:
+      - RABBIT_BROKER_URL=pyamqp://admin:MyStr0ngP@ss2024!@rabbitmq//
+      - RABBIT_BACKEND=redis://redis:6379/0
 ```
 
-## ✅ Conclusion
+---
 
-Avec **pytune_helpers**, l'envoi d'e-mails devient simple et efficace, avec un support de l'envoi différé grâce à Celery et RabbitMQ. 🚀
+## 🛠 Débogage & Logs
 
-🔥 **Prochaines étapes :** Ajouter des tests unitaires et améliorer les logs d'e-mails envoyés. 📊
+Toutes les actions du module sont journalisées avec `pytune_logger`.
+
+📌 Les logs seront visibles dans **OpenSearch** si configuré.
+
+En cas d’erreur, consultez les logs avec :
+
+```python
+from pytune_logger import get_logger
+logger = get_logger("pytune", "email_service")
+await logger.log_info("Test de log")
+```
+
+---
+
+## 📌 Conclusion
+
+`pytune_helpers` permet une gestion efficace des emails et leur envoi en arrière-plan via Celery.
+Il s'intègre parfaitement avec `pytune_configuration` et `pytune_logger` pour centraliser la gestion des paramètres et la journalisation.
+
+🚀 **Prochaine étape** : Déploiement du worker Celery sur le serveur ! 🎯
 
