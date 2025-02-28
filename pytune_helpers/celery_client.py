@@ -1,3 +1,4 @@
+import os
 from celery import Celery
 from pytune_configuration.sync_config_singleton import config, SimpleConfig
 import asyncio
@@ -24,8 +25,8 @@ class CeleryClient:
         """
         Initialize the Celery client with configuration from .env and perform a health check.
         """
-        broker_url = config.RABBIT_BROKER_URL
-        backend_url = config.RABBIT_BACKEND
+        broker_url = os.getenv("RABBIT_BROKER_URL")
+        backend_url = os.getenv("RABBIT_BACKEND")
 
         # Initialize the Celery client
         self.celery_client = Celery(
