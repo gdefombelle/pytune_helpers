@@ -4,11 +4,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
 from .celery_client import CeleryClient, CeleryInitializationError
-from pytune_logger import Logger, get_logger
+from simple_logger.logger import SimpleLogger, get_logger
 from pytune_configuration.sync_config_singleton import config, SimpleConfig
 
 if config is None:
     config = SimpleConfig()
+
+logger : SimpleLogger = get_logger()
 
 class EmailService:
     _instance = None
@@ -37,21 +39,21 @@ class EmailService:
         self.smtp_user = smtp_user or config.SMTP_USER
         self.smtp_password = smtp_password or config.SMTP_PASSWORD
         self.from_email = from_email or config.FROM_EMAIL
-        self.logger = get_logger("pytune", "email_service")
+        self.logger : SimpleLogger = get_logger()
 
         if not all([self.smtp_server, self.smtp_port, self.smtp_user, self.smtp_password, self.from_email]):
-            self.logger.sync_log_critical("SMTP configuration is incomplete")
+            self.logger.critical("SMTP configuration is incomplete")
             raise ValueError("SMTP configuration is incomplete")
         # Prépare Celery (pour l'intégration avec RabbitMQ)
         try:
             self.celery_client = CeleryClient()
-            self.logger.sync_log_info(f"Health check during initialization: {self.celery_client.health_status}")
+            self.logger.info(f"Health check during initialization: {self.celery_client.health_status}")
             if self.celery_client.health_status["status"] != "OK":
-                self.logger.sync_log_critical("Celery client health check error failed")
+                self.logger.critical("Celery client health check error failed")
                 raise CeleryInitializationError(f"Celery health check failed: {self.celery_client.health_status['message']}")
         except Exception as e:
             self.celery_client = None  # Désactive Celery en cas d'erreur
-            self.logger.sync_log_error(f"Failed to initialize Celery client: {str(e)}")
+            self.logger.error(f"Failed to initialize Celery client: {str(e)}")
 
 
     def get_smtp_config(self):
@@ -68,7 +70,7 @@ class EmailService:
         if not from_email:
             from_email = self.from_email
         if not from_email:
-            await self.logger.log_error(f"SMTP 'from_email' not configured - Sending {subject} to: {to_email}")
+            await self.logger.aerror(f"SMTP 'from_email' not configured - Sending {subject} to: {to_email}")
             raise ValueError("SMTP 'from_email' not configured")
 
         if send_background:
@@ -80,7 +82,7 @@ class EmailService:
                 is_html = is_html,
                 from_email = formataddr(("Pytune Support", from_email))
             )
-            await self.logger.log_info(f"Email to {to_email} scheduled to be sent in background")
+            await self.logger.ainfo(f"Email to {to_email} scheduled to be sent in background")
             return {"message": "Email scheduled to be sent in background"}
         
         # Construire le message
@@ -88,7 +90,7 @@ class EmailService:
 
         # Envoi immédiat
         await self._send_email_task(message)
-        await self.logger.log_info(f"Email {subject} to: {to_email} sent successfully")
+        await self.logger.ainfo(f"Email {subject} to: {to_email} sent successfully")
         return {"message": "Email sent successfully"}
 
     def _build_email(self, to_email: str, subject: str, body: str, is_html: bool, from_email: str):
@@ -116,8 +118,8 @@ class EmailService:
                 username=self.smtp_user,
                 password=self.smtp_password,
             )
-            await self.logger.log_info(f"Email sent to {message['To']}")
+            await self.logger.ainfo(f"Email sent to {message['To']}")
         except Exception as e:
-            await self.logger.log_error(f"Failed to send email to {message['To']}: {e}")
+            await self.logger.aerror(f"Failed to send email to {message['To']}: {e}")
 
    
