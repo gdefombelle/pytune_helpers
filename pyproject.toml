@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytune_helpers"
-version = "1.1.0"
+version = "1.1.1"
 description = "Helper package for PyTune platform, including email services and background task handling with Celery and RabbitMQ."
 authors = ["Gabriel de Fombelle <gabriel.de.fombelle@gmail.com>"]
 license = "MIT"
@@ -10,8 +10,8 @@ python = "^3.12"
 aiosmtplib = "^1.1.6"
 celery = "^5.3.1"
 kombu = "^5.3.0"  # Utilisé par Celery pour les communications avec RabbitMQ
-simple_logger = { path = "../simple_logger" }
-pytune_configuration = { path = "../pytune_configuration" }
+simple_logger = { git = "https://github.com/gdefombelle/simple_logger.git" }
+pytune_configuration = { git = "https://github.com/gdefombelle/pytune_configuration.git"}
 
 [tool.poetry.dev-dependencies]
 pytest-asyncio = "^0.21.1"
