@@ -130,9 +130,9 @@ Toutes les actions du module sont journalisées avec `pytune_logger`.
 En cas d’erreur, consultez les logs avec :
 
 ```python
-from pytune_logger import get_logger
+from simple_logger import get_logger
 logger = get_logger("pytune", "email_service")
-await logger.log_info("Test de log")
+await logger.ainfo("Test de log")
 ```
 
 ---
@@ -140,7 +140,7 @@ await logger.log_info("Test de log")
 ## 📌 Conclusion
 
 `pytune_helpers` permet une gestion efficace des emails et leur envoi en arrière-plan via Celery.
-Il s'intègre parfaitement avec `pytune_configuration` et `pytune_logger` pour centraliser la gestion des paramètres et la journalisation.
+Il s'intègre parfaitement avec `pytune_configuration` et `simple_logger` pour centraliser la gestion des paramètres et la journalisation.
 
 🚀 **Prochaine étape** : Déploiement du worker Celery sur le serveur ! 🎯
 

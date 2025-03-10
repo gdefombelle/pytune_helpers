@@ -7,7 +7,7 @@ Envoi immédiat d'e-mails via SMTP
 
 Support de l'envoi différé avec Celery + RabbitMQ + Redis
 
-Centralisation des logs avec pytune_logger
+Centralisation des logs avec simple_logger
 
 Configuration dynamique via pytune_configuration
 
