@@ -1,7 +1,6 @@
 import os
 from celery import Celery
 from pytune_configuration.sync_config_singleton import config, SimpleConfig
-import asyncio
 
 if config is None:
     config = SimpleConfig()
