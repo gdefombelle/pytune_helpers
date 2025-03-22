@@ -1,9 +1,12 @@
 import os
 from celery import Celery
 from pytune_configuration.sync_config_singleton import config, SimpleConfig
+from simple_logger.logger import SimpleLogger, get_logger
 
 if config is None:
     config = SimpleConfig()
+
+logger : SimpleLogger = get_logger()
 
 class CeleryInitializationError(Exception):
     """
@@ -26,6 +29,8 @@ class CeleryClient:
         """
         broker_url = os.getenv("RABBIT_BROKER_URL")
         backend_url = os.getenv("RABBIT_BACKEND")
+        logger.info(f"Celery Client, brocker_url: {broker_url} ")
+        logger.info(f"Celery Client, backend_url: url: {backend_url} ")
 
         # Initialize the Celery client
         self.celery_client = Celery(

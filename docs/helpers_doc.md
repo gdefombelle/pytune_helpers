@@ -3,7 +3,7 @@
 ## 📝 Introduction
 `pytune_helpers` est un module utilitaire conçu pour centraliser et faciliter l'envoi des emails dans PyTune. Il permet d'envoyer des emails immédiatement ou en tâche de fond via Celery, RabbitMQ et Redis.
 
-Ce module est **dépendant de `pytune_configuration`** pour récupérer les paramètres SMTP et de `pytune_logger` pour la journalisation.
+Ce module est **dépendant de `pytune_configuration`** pour récupérer les paramètres SMTP et de `simple_logger` pour la journalisation.
 
 ---
 
@@ -25,7 +25,7 @@ poetry add pytune_helpers
 ### 2️⃣ Dépendances
 `pytune_helpers` dépend de **deux autres packages PyTune** :
 - [`pytune_configuration`](https://github.com/gdefombelle/pytune_configuration) (récupération des paramètres SMTP, RabbitMQ, Redis)
-- [`pytune_logger`](https://github.com/gdefombelle/pytune_logger) (journalisation des événements)
+- [`simple_logger`](https://github.com/gdefombelle/simple_logger) (journalisation des événements)
 
 Assurez-vous qu'ils sont bien installés.
 
@@ -123,7 +123,7 @@ services:
 
 ## 🛠 Débogage & Logs
 
-Toutes les actions du module sont journalisées avec `pytune_logger`.
+Toutes les actions du module sont journalisées avec `simple_logger`.
 
 📌 Les logs seront visibles dans **OpenSearch** si configuré.
 
