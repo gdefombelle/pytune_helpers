@@ -6,7 +6,7 @@ from simple_logger.logger import SimpleLogger, get_logger
 if config is None:
     config = SimpleConfig()
 
-logger : SimpleLogger = get_logger()
+logger : SimpleLogger = get_logger("email_worker")
 
 class CeleryInitializationError(Exception):
     """

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytune_helpers"
-version = "1.1.1"
+version = "1.2.0"
 description = "Helper package for PyTune platform, including email services and background task handling with Celery and RabbitMQ."
 authors = ["Gabriel de Fombelle <gabriel.de.fombelle@gmail.com>"]
 license = "MIT"

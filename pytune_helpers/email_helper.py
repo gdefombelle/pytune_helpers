@@ -9,7 +9,7 @@ from pytune_configuration.sync_config_singleton import config, SimpleConfig
 if config is None:
     config = SimpleConfig()
 
-logger : SimpleLogger = get_logger()
+logger : SimpleLogger = get_logger("email_worker")
 
 class EmailService:
     _instance = None
