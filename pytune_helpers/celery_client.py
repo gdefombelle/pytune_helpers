@@ -29,8 +29,7 @@ class CeleryClient:
         """
         broker_url = os.getenv("RABBIT_BROKER_URL")
         backend_url = os.getenv("RABBIT_BACKEND")
-        logger.info(f"Celery Client, brocker_url: {broker_url} ")
-        logger.info(f"Celery Client, backend_url: url: {backend_url} ")
+        logger.info(f"Celery Client, brocker_url: {broker_url} , backend_url: url: {backend_url} ")
 
         # Initialize the Celery client
         self.celery_client = Celery(
@@ -65,7 +64,7 @@ class CeleryClient:
                     f"Initialization failed: {self.health_status['message']}"
                 )
         except CeleryInitializationError as e:
-            print(f"Error during Celery initialization: {e}")
+            logger.error(f"Error during Celery initialization: {e}")
             raise
 
     def check_health(self):
@@ -75,16 +74,16 @@ class CeleryClient:
         try:
             # Submit the health_check task
             result = self.health_check.delay()
-            print(f"Health check task submitted with ID: [{result.id}]")
+            logger.info(f"Health check task submitted with ID: [{result.id}]")
 
             # Retrieve the result
             res = result.get(timeout=10)
-            print(f"Health check result: {res}")
+            logger.info(f"Health check result: {res}")
             return res
         except Exception as e:
             error_message = {
                 "status": "ERROR",
                 "message": f"Health check task failed: {str(e)}",
             }
-            print(error_message)
+            logger.error(error_message)
             return error_message
