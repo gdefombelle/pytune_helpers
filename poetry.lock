@@ -310,6 +310,21 @@ files = [
 ]
 
 [[package]]
+name = "exifread"
+version = "3.3.2"
+description = "Library to extract Exif information from digital camera image files."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "exifread-3.3.2-py3-none-any.whl", hash = "sha256:f927cf4522827cc3ecfade8d0da37bbd5421f636eda7e650b61e9ce4c9a451fe"},
+    {file = "exifread-3.3.2.tar.gz", hash = "sha256:45c6a6564dd52e63a5d93c5e216fd65c38513b450167bee6d73183415db71358"},
+]
+
+[package.extras]
+dev = ["build (>=1.0,<2.0)", "pre-commit (>=2.21,<3.0)", "pylint (>=3.0,<4.0)"]
+test = ["pytest (>=7.4,<8.0)"]
+
+[[package]]
 name = "fastapi"
 version = "0.115.12"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1146,4 +1161,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12.3"
-content-hash = "588de1b59a95c5bf3307543634b34d0d65acf0139a58ab60581ed989e00dfd0b"
+content-hash = "ef53da911c5e1937bff055e989766c32944a801ca6455c408e8afb65732ea84f"
