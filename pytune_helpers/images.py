@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import os
 import tempfile
 from pytune_data import minio_client
-from pytune_helpers.exif import extract_exif_with_exifread, extract_gps_from_exifread
+from pytune_helpers.exif_gps import extract_exif_with_exifread, extract_gps_from_exifread
 
 register_heif_opener()  # Active le support HEIC
 
@@ -77,8 +77,6 @@ def compress_image_and_extract_metadata(image_bytes: bytes, max_side: int = 1024
 
     return output, safe_json(metadata)
 
-
-
 async def download_images_locally(image_urls: list[str]) -> list[str]:
     """
     Télécharge les images depuis MinIO (via URLs) et retourne les chemins temporaires.
@@ -106,3 +104,4 @@ async def download_images_locally(image_urls: list[str]) -> list[str]:
             raise RuntimeError(f"Error downloading from MinIO: {object_name} ({bucket}): {e}")
 
     return local_paths
+
