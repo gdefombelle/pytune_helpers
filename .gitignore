@@ -1,7 +1,23 @@
-# Ignorer les environnements virtuels
-venv/
+# Python / Poetry
 __pycache__/
 *.pyc
 *.pyo
-.env
+.venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.cache/
+
+# OS / IDE
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env
+.env
+.env.*.local

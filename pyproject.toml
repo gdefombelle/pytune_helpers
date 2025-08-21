@@ -1,38 +1,49 @@
 [tool.poetry]
-name = "pytune_helpers"
+name = "pytune-helpers"                   # distribution normalisée (tiret)
 version = "1.2.0"
-description = "Helper package for PyTune platform, including email services and background task handling with Celery and RabbitMQ."
+description = "Helper package for PyTune platform, including email services, EXIF/GPS utils, and Celery/RabbitMQ helpers."
 authors = ["Gabriel de Fombelle <gabriel.de.fombelle@gmail.com>"]
 license = "MIT"
+readme = "README.md"
 packages = [{ include = "pytune_helpers" }]
 
-
-
 [tool.poetry.dependencies]
-python = "^3.12.3"
-aiosmtplib = "^1.1.6"
-celery = "^5.3.1"
-kombu = "^5.3.0"  # Utilisé par Celery pour les communications avec RabbitMQ
-# -- PROD --
-# simple_logger = { git = "https://github.com/gdefombelle/simple_logger.git" }
-# pytune_configuration = { git = "https://github.com/gdefombelle/pytune_configuration.git"}
+python = ">=3.12,<3.13"
 
-# -- DEV --
-simple_logger = { path = "../../packages/simple_logger" }
-pytune_configuration = { path = "../../packages/pytune_configuration"}
-pillow = "^11.2.1"
-pillow-heif = "^1.0.0"
+# --- Messaging / Background ---
+celery = "^5.3.1"
+kombu = "^5.3.0"            # (optionnel) → tu peux le retirer: celery le tire déjà
+aiosmtplib = "^1.1.7"
+
+# --- EXIF/GPS / Images ---
 exifread = "^3.3.2"
 
-[tool.poetry.dev-dependencies]
-pytest-asyncio = "^0.21.1"
-mypy = "^1.6.0"
-flake8 = "^6.1.0"
-black = "^23.9.1"
-isort = "^5.12.0"
+# ⚠️ IMPORTANT : unifie Pillow
+# Choisis UNE version commune pour TOUT ton monorepo. Je te conseille Pillow 11.x partout.
+# -> Mets Pillow "^11.2.1" ici, ET aligne les autres packages qui utilisent Pillow sur "^11.2.1".
+pillow = "^11.2.1"
 
+# Si tu lis des HEIC/HEIF localement, garde pillow-heif, sinon commente-le.
+# Sous Docker (Debian/Ubuntu slim) ça marche sans dépendances OS ; sous Alpine, parfois il manque des codecs.
+pillow-heif = { version = "^1.0.0" }
+
+# --- Dépendances internes (mode DEV) ---
+simple-logger = { path = "../../packages/simple_logger", develop = true }
+pytune-configuration = { path = "../../packages/pytune_configuration", develop = true }
+pytune-data = { path = "../../packages/pytune_data", develop = true }
+
+[tool.poetry.extras]
+# Permet aux services qui en ont besoin de déclarer: pytune-helpers[heif]
+heif = ["pillow-heif"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.8"
+ruff = "^0.6.8"
+mypy = "^1.11.1"
+black = "^24.8.0"
+isort = "^5.13.2"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
-

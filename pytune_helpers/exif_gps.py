@@ -8,7 +8,7 @@ import requests
 import exifread
 
 from pytune_configuration.sync_config_singleton import config, SimpleConfig
-from pytune_data.minio_utils import download_from_minio_url
+
 
 if config is None:
     config = SimpleConfig()
@@ -243,6 +243,7 @@ def get_city_country_from_image(minio_url: str,
     Télécharge l'image depuis MinIO, lit les EXIF, extrait GPS si présent,
     fait un reverse geocoding, sinon renvoie les valeurs par défaut.
     """
+    from pytune_data.minio_utils import download_from_minio_url
     try:
         image_bytes = download_from_minio_url(minio_url)
         exif_tags = extract_exif_with_exifread(image_bytes)

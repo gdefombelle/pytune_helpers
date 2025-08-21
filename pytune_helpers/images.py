@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import os
 import tempfile
 from pytune_data import minio_client
-from pytune_helpers.exif_gps import extract_exif_with_exifread, extract_gps_from_exifread
+
 
 register_heif_opener()  # Active le support HEIC
 
@@ -34,6 +34,7 @@ def compress_image(image_bytes: bytes, max_side: int = 1024, quality: int = 80) 
 
 
 def compress_image_and_extract_metadata(image_bytes: bytes, max_side: int = 1024, quality: int = 80) -> tuple[BytesIO, dict]:
+    from pytune_helpers.exif_gps import extract_exif_with_exifread, extract_gps_from_exifread
     image = Image.open(BytesIO(image_bytes))
     format_original = image.format
     width_original, height_original = image.size
